@@ -1,27 +1,11 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: AutoScaling and Launch Configuration for openvpn onboarding
+Description: AutoScaling and Launch Configuration for onboarding
 Parameters:
   #=======================================================
   #
   #                   CloudFormation Parameters
   #
   #=======================================================
-  EC2SecurityGroupId:
-    Type: String
-    Description: Security group id used for EC2 Instance
-  EC2AmiId:
-    Description: AMI ID Used for EC2 Ubuntu Instance
-    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
-    Default: /aws/service/canonical/ubuntu/server/jammy/stable/current/amd64/hvm/ebs-gp2/ami-id
-  EC2InstanceType:
-    Type: String
-    Description: Instance Type Used for EC2
-  VPCPrivateSubnetId:
-    Type: String
-    Description: VPC Private Subnet id
-  VPCPrivateSubnetAvailabilityZone:
-    Type: String
-    Description: VPC Private Subnet Availability zone
   SnsFailureSummaryTopicARN:
     Type: String
     Description: SNS topic to post summary message on failure case
@@ -100,49 +84,3 @@ Resources:
       Roles:
         - Ref: IAMRole
 
-  AutoScalingGroup:
-    Type: AWS::AutoScaling::AutoScalingGroup
-    Properties:
-      AutoScalingGroupName: openvpn-onboarding-autoscaling-group
-      LaunchTemplate:
-        LaunchTemplateId:
-          Ref: EC2LaunchTemplate
-        Version:
-          Fn::GetAtt:
-            - EC2LaunchTemplate
-            - LatestVersionNumber
-      MinSize: 1
-      MaxSize: 1
-      DesiredCapacity: 1
-      Cooldown: 300
-      AvailabilityZones:
-        - Ref: VPCPrivateSubnetAvailabilityZone
-      HealthCheckType: EC2
-      HealthCheckGracePeriod: 300
-      VPCZoneIdentifier:
-        - Ref: VPCPrivateSubnetId
-      TerminationPolicies:
-        - Default
-      NewInstancesProtectedFromScaleIn: false
-
-  EC2LaunchTemplate:
-    Type: AWS::EC2::LaunchTemplate
-    Properties:
-      LaunchTemplateName: openvpn-onboarding-launch-template
-      LaunchTemplateData:
-        UserData: replace_with_user_data_base_64_script
-        IamInstanceProfile:
-          Arn:
-            Fn::GetAtt:
-              - IAMInstanceProfile
-              - Arn
-        NetworkInterfaces:
-          - DeviceIndex: 0
-            Groups:
-              - Ref: EC2SecurityGroupId
-            SubnetId:
-              Ref: VPCPrivateSubnetId
-        ImageId:
-          Ref: EC2AmiId
-        InstanceType:
-          Ref: EC2InstanceType

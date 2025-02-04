@@ -15,15 +15,6 @@ Parameters:
     Description: Management API password
     NoEcho: true
     MinLength: 1
-  OpenvpnOnboardingUsername:
-    Type: String
-    Description: Username for OpenVPN
-    MinLength: 1
-  OpenvpnOnboardingPassword:
-    Type: String
-    NoEcho: true
-    Description: Password for OpenVPN
-    MinLength: 1
   LambdaCron:
     Description: Crontab that determines when CloudWatch Events runs the rule that triggers the Lambda function.
     Default: cron(0 1 * * ? *)
@@ -53,13 +44,6 @@ Parameters:
     Description: Email for Success Topic Subscription. Empty string or valid e-mail. Verbose !
     Type: String
     AllowedPattern: ^$|[^\s@]+@[^\s@]+\.[^\s@]+
-  EC2InstanceType:
-    Description: EC2 Instance type
-    Type: String
-    Default: t2.micro
-    AllowedValues:
-      - t2.micro
-      - t3a.micro
 Mappings:
   #=======================================================
   #
@@ -80,7 +64,6 @@ Mappings:
       OnboardingPathSSMParamName: replace_with_ssm_param_name_to_onboarding_path
       ProxyServerSSMParamName: replace_with_ssm_param_name_to_proxy_server
       BreakoutRegionSSMParamName: replace_with_ssm_param_name_to_breakout_region
-      OpenVPNCredentialsSecretName: replace_with_secret_name_to_openvpn_creds
       SNSFailureTopicName: replace_with_sns_failure_topic_name
       SNSSuccessTopicName: replace_with_sns_success_topic_name
 
@@ -469,10 +452,6 @@ Resources:
           Ref: APIGatewayStageName
         SimOnboardingPath:
           Ref: SimOnboardingPath
-        PublicIpAddress:
-          Fn::GetAtt:
-            - NetworkResourcesStack
-            - Outputs.PublicIpAddress
       TemplateURL:
         Fn::Join:
           - ""
@@ -583,51 +562,14 @@ Resources:
                 - CodebaseVersion
             - /sns.yaml
 
-  NetworkResourcesStack:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      TemplateURL:
-        Fn::Join:
-          - ""
-          - - https://
-            - Fn::FindInMap:
-                - Configuration
-                - BaseConfiguration
-                - CodebaseBucket
-            - .s3-
-            - Fn::FindInMap:
-                - Configuration
-                - BaseConfiguration
-                - CodebaseBucketRegion
-            - .amazonaws.com/
-            - Fn::FindInMap:
-                - Configuration
-                - BaseConfiguration
-                - CodebaseVersion
-            - /network.yaml
-
   AutoScalingAndLaunchTemplateStack:
     Type: AWS::CloudFormation::Stack
     Properties:
       Parameters:
-        EC2SecurityGroupId:
-          Fn::GetAtt:
-            - NetworkResourcesStack
-            - Outputs.EC2SecurityGroupId
-        VPCPrivateSubnetId:
-          Fn::GetAtt:
-            - NetworkResourcesStack
-            - Outputs.VPCPrivateSubnetId
-        VPCPrivateSubnetAvailabilityZone:
-          Fn::GetAtt:
-            - NetworkResourcesStack
-            - Outputs.VPCPrivateSubnetAvailabilityZone
         SnsFailureSummaryTopicARN:
           Fn::GetAtt:
             - SNSResourcesStack
             - Outputs.SNSFailureTopicArn
-        EC2InstanceType:
-          Ref: EC2InstanceType
         SnsSuccessSummaryTopicARN:
           Fn::GetAtt:
             - SNSResourcesStack
@@ -742,15 +684,6 @@ Resources:
           Ref: ManagementApiUsername
         ManagementApiPassword:
           Ref: ManagementApiPassword
-        OpenvpnOnboardingUsername:
-          Ref: OpenvpnOnboardingUsername
-        OpenvpnOnboardingPassword:
-          Ref: OpenvpnOnboardingPassword
-        OpenVPNCredentialsSecretName:
-          Fn::FindInMap:
-            - Configuration
-            - BaseConfiguration
-            - OpenVPNCredentialsSecretName
       TemplateURL:
         Fn::Join:
           - ""

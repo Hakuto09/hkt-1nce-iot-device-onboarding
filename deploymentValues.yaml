@@ -9,9 +9,9 @@ snsSuccessTopicName: onboarding-success
 snsFailureTopicName: onboarding-failure
 
 dev:
-  codeBaseBucket: device-onboarding-dev-cloudformation-templates
-  codeBaseBucketRegion: eu-central-1
+  codeBaseBucket: hkt-1nce-device-onboarding-dev-cloudformation-templates
+  codeBaseBucketRegion: ap-northeast-1
 
 prod:
-  codeBaseBucket: device-onboarding-prod-cloudformation-templates
-  codeBaseBucketRegion: eu-central-1
+  codeBaseBucket: hkt-1nce-device-onboarding-prod-cloudformation-templates
+  codeBaseBucketRegion: ap-northeast-1

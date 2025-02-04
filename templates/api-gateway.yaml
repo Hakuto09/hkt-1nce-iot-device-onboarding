@@ -28,10 +28,6 @@ Parameters:
     Type: String
     Description: Lambda ARN for Device Onboarding
 
-  PublicIpAddress:
-    Type: String
-    Description: Public EIP Ip Address of the Device Onboarding VPC
-
 Resources:
   #=======================================================
   #
@@ -53,10 +49,6 @@ Resources:
             Principal: "*"
             Action: execute-api:Invoke
             Resource: execute-api:/*
-            Condition:
-              IpAddress:
-                aws:SourceIp:
-                  - Fn::Sub: ${PublicIpAddress}/32
 
   ApiGatewayResourceOnboarding:
     Type: AWS::ApiGateway::Resource

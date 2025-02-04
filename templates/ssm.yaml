@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: SSM parameters for openvpn onboarding
+Description: SSM parameters for onboarding
 Parameters:
   #=======================================================
   #
