@@ -5,11 +5,18 @@ import { NotFoundError } from "../shared/types/error";
 import { type SIM } from "../shared/types/sim";
 import { type IOnboardingResponse } from "../shared/types/onboarding";
 import { ACCEPT_HEADER, CSV_DATA_TYPE, IP_HEADER, REMOVE_NEWLINE_REGEX } from "../shared/utils/utils";
+const fileName = "device-onboarding.ts";
+
+console.log(fileName, ":After import:");
 
 const AMAZON_ROOTCA_URL = process.env.AMAZON_ROOTCA_URL as string;
 const IOT_CORE_ENDPOINT_URL = process.env.IOT_CORE_ENDPOINT_URL as string;
 
 export const handler = async (event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> => {
+  const funcName = [":handler:", " :"];
+  console.log(fileName, funcName[0], funcName[1], "In.");
+  console.log(fileName, funcName[0], funcName[1], " event ", event);
+
   try {
     const ipAddress = event.headers[IP_HEADER];
     if (!ipAddress) {
